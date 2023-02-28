@@ -6,7 +6,7 @@ import pytest
 from dispatches_data_packages import api
 
 
-def _is_nonempty(p: Path, min_size_bytes: int = 1) -> bool:
+def _is_nonempty_file(p: Path, min_size_bytes: int = 1) -> bool:
     if p.exists() and p.is_file():
         return p.stat().st_size >= min_size_bytes
     return False
@@ -19,13 +19,14 @@ class DataPackage(pytest.Item):
         self.required = list(required)
 
     def runtest(self):
-        if self.key not in api.available():
-            raise LookupError(f"Data package {self.key} not found")
+        available = api.available()
+        if self.key not in available:
+            raise LookupError(f"Data package {self.key} not found in {list(available)}")
         path = api.path(self.key)
         if not path:
             raise LookupError("Could not find path")
         missing = []
-        for fname in required:
+        for fname in self.required:
             fpath = path / fname
             if not _is_nonempty_file(fpath):
                 missing.append(fpath)
@@ -51,7 +52,7 @@ class DataPackagePlugin:
         for key in self._to_check:
             item = DataPackage.from_parent(
                 session,
-                name="data_packages::{key}",
+                name=f"data_packages::{key}",
                 key=key,
                 required=list(self.required_files),
             )
