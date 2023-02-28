@@ -21,4 +21,4 @@ dynamic = ["version"]
 for-api-testing = "dispatches_data_packages._for_api_testing"
 
 [project.entry-points.pytest11]
-data_packages = "dispatches_data_packages.test.plugins.plugin"
+data_packages = "dispatches_data_packages.testing.plugins:plugin"
