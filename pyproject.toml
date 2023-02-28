@@ -17,6 +17,8 @@ requires-python = ">= 3.8"
 dependencies = [
 ]
 dynamic = ["version"]
+[project.entry-points.data_packages]
+for-api-testing = "dispatches_data_packages._for_api_testing"
 
 [project.entry-points.pytest11]
 data_packages = "dispatches_data_packages.test.plugins.plugin"
