@@ -13,14 +13,14 @@ def _is_nonempty(p: Path, min_size_bytes: int = 1) -> bool:
 
 
 class DataPackage(pytest.Item):
-    def __init__(self, *, required: List[Path], **kwargs):
+    def __init__(self, *, key, required: List[Path], **kwargs):
         super().__init__(**kwargs)
         self.key = key
         self.required = list(required)
 
     def runtest(self):
         if self.key not in api.available():
-            raise LookupError(f"Data package {key} not found")
+            raise LookupError(f"Data package {self.key} not found")
         path = api.path(self.key)
         if not path:
             raise LookupError("Could not find path")
