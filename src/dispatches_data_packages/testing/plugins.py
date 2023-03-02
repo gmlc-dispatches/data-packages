@@ -20,9 +20,9 @@ class DataPackage(pytest.Item):
         self.key = key
 
     def runtest(self):
-        available = api.available()
-        if self.key not in available:
-            raise LookupError(f"Data package {self.key} not found in {list(available)}")
+        discovered = api.discovered()
+        if self.key not in discovered:
+            raise LookupError(f"Data package {self.key} not found in {list(discovered)}")
         path = api.path(self.key)
         if not path:
             raise LookupError("Could not find path")

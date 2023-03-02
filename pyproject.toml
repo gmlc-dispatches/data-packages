@@ -15,10 +15,9 @@ name = "dispatches-data-packages"
 readme = "README.md"
 requires-python = ">= 3.8"
 dependencies = [
+    "importlib_metadata ; python_version < '3.10'",
 ]
 dynamic = ["version"]
-[project.entry-points.data_packages]
-for-api-testing = "dispatches_data_packages._for_api_testing"
 
 [project.entry-points.pytest11]
 data_packages = "dispatches_data_packages.testing.plugins:plugin"

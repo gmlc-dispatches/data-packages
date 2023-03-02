@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from functools import singledispatch
 from importlib import import_module
-from importlib import metadata
+import importlib_metadata as metadata  # packages_distribution() only on 3.10+
 from importlib import resources
 import logging
 from pathlib import Path
@@ -32,6 +32,37 @@ class PackageInfo:
                         distribution_name=distr.metadata["Name"],
                         version=distr.version,
                     )
+
+    @classmethod
+    def from_parent_package(cls, name: str) -> Iterable["PackageInfo"]:
+        for distr_name in metadata.packages_distributions()[name]:
+            distr = metadata.distribution(distr_name)
+            for pkg_file_path in distr.files:
+                parts = pkg_file_path.parts
+                if len(parts) != 3: continue
+                parent_name, key, fname = parts
+                if fname not in {"__init__.py"}: continue
+                yield cls(
+                    key=key,
+                    package_name=".".join([parent_name, key]),
+                    distribution_name=distr_name,
+                    version=distr.version,
+                )
+
+
+def discovered(parent_name: str = "dispatches_data_packages") -> Dict[str, PackageInfo]:
+    discovered = [
+        info for info in PackageInfo.from_parent_package(parent_name)
+        if not info.package_name == __spec__.name
+    ]
+
+    if not discovered:
+        _logger.warning(f"No package discovered from parent package {parent_name!r}")
+
+    return {
+        info.key: info
+        for info in discovered
+    }
 
 
 def available(group="data_packages") -> Dict[str, PackageInfo]:
@@ -66,10 +97,10 @@ def _from_package_info(info: PackageInfo, resource: PackageResource = None) -> P
 
 @path.register
 def _from_string(key: str, resource: PackageResource = None) -> Path:
-    by_key = dict(available())
+    by_key = dict(discovered())
     try:
         info = by_key[key]
     except KeyError:
-        raise LookupError(f"{key!r} not found among registered packages: {package_name_by_key}")
+        raise LookupError(f"{key!r} not found among discovered packages: {package_name_by_key}")
 
     return path(info, resource)
