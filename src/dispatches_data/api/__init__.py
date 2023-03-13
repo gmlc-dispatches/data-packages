@@ -16,6 +16,17 @@ from typing import Union
 _logger = logging.getLogger(__name__)
 
 
+_MODNAME_SEPARATOR = "."
+
+
+def _modname_to_parts(name: str) -> List[str]:
+    return name.split(_MODNAME_SEPARATOR)
+
+
+def _parts_to_modname(parts: Iterable[str]) -> str:
+    return _MODNAME_SEPARATOR.join(parts)
+
+
 @dataclass
 class PackageInfo:
     key: str
@@ -36,33 +47,31 @@ class PackageInfo:
                     )
 
     @classmethod
-    def from_parent_package(cls, root_package_name: str, subpackage_containing_data: str = "packages") -> Iterable["PackageInfo"]:
-        for distr_name in metadata.packages_distributions()[root_package_name]:
+    def from_parent_package(cls, dotted_name: str) -> Iterable["PackageInfo"]:
+        parent_package_parts = list(_modname_to_parts(dotted_name))
+        top_level = parent_package_parts[0]
+
+        for distr_name in metadata.packages_distributions()[top_level]:
             distr = metadata.distribution(distr_name)
             for pkg_file_path in distr.files:
-                try:
-                    top_level, parent, key, fname = pkg_file_path.parts
-                except ValueError:
-                    # wrong number of items to unpack
-                    continue
+                *parent_parts, key, fname = pkg_file_path.parts
                 if (
-                    top_level != root_package_name or
-                    parent != subpackage_containing_data or
-                    fname not in {"__init__.py"}
+                    fname not in {"__init__.py"} or
+                    list(parent_parts) != parent_package_parts
                 ):
                     continue
 
                 yield cls(
                     key=key,
-                    package_name=".".join([top_level, parent, key]),
+                    package_name=_parts_to_modname([*parent_parts, key]),
                     distribution_name=distr_name,
                     version=distr.version,
                 )
 
 
-def discovered(parent_name: str = "dispatches_data") -> Dict[str, PackageInfo]:
+def discovered(parent: str = "dispatches_data.packages") -> Dict[str, PackageInfo]:
     discovered = [
-        info for info in PackageInfo.from_parent_package(parent_name)
+        info for info in PackageInfo.from_parent_package(parent)
         if not info.package_name == __spec__.name
     ]
 
