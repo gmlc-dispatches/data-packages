@@ -34,23 +34,31 @@ class PackageInfo:
                     )
 
     @classmethod
-    def from_parent_package(cls, name: str) -> Iterable["PackageInfo"]:
-        for distr_name in metadata.packages_distributions()[name]:
+    def from_parent_package(cls, root_package_name: str, subpackage_containing_data: str = "packages") -> Iterable["PackageInfo"]:
+        for distr_name in metadata.packages_distributions()[root_package_name]:
             distr = metadata.distribution(distr_name)
             for pkg_file_path in distr.files:
-                parts = pkg_file_path.parts
-                if len(parts) != 3: continue
-                parent_name, key, fname = parts
-                if fname not in {"__init__.py"}: continue
+                try:
+                    top_level, parent, key, fname = pkg_file_path.parts
+                except ValueError:
+                    # wrong number of items to unpack
+                    continue
+                if (
+                    top_level != root_package_name or
+                    parent != subpackage_containing_data or
+                    fname not in {"__init__.py"}
+                ):
+                    continue
+
                 yield cls(
                     key=key,
-                    package_name=".".join([parent_name, key]),
+                    package_name=".".join([top_level, parent, key]),
                     distribution_name=distr_name,
                     version=distr.version,
                 )
 
 
-def discovered(parent_name: str = "dispatches_data_packages") -> Dict[str, PackageInfo]:
+def discovered(parent_name: str = "dispatches_data") -> Dict[str, PackageInfo]:
     discovered = [
         info for info in PackageInfo.from_parent_package(parent_name)
         if not info.package_name == __spec__.name

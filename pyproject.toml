@@ -20,4 +20,4 @@ dependencies = [
 dynamic = ["version"]
 
 [project.entry-points.pytest11]
-data_packages = "dispatches_data_packages.testing.plugins:plugin"
+data_packages = "dispatches_data.testing.plugins:plugin"
