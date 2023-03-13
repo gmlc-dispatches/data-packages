@@ -84,16 +84,6 @@ def discovered(parent: str = "dispatches_data.packages") -> Dict[str, PackageInf
     }
 
 
-def available(group="data_packages") -> Dict[str, PackageInfo]:
-    discovered = list(PackageInfo.from_entry_points(group))
-    if not discovered:
-        _logger.warning("No package discovered from {group!r}")
-    return {
-        info.key: info
-        for info in discovered
-    }
-
-
 PackageResource = Optional[str]
 
 
