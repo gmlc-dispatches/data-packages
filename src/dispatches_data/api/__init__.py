@@ -8,7 +8,9 @@ from pathlib import Path
 from types import ModuleType
 from typing import Dict
 from typing import Iterable
+from typing import List
 from typing import Optional
+from typing import Union
 
 
 _logger = logging.getLogger(__name__)
@@ -112,3 +114,19 @@ def _from_string(key: str, resource: PackageResource = None) -> Path:
         raise LookupError(f"{key!r} not found among discovered packages: {package_name_by_key}")
 
     return path(info, resource)
+
+
+AnyPackageSpecifier = Union[str, PackageInfo, ModuleType]
+
+
+def files(spec: AnyPackageSpecifier, relative: bool = False) -> List[Path]:
+    pkg_dir = path(spec)
+    file_paths = (
+        p
+        for p in pkg_dir.rglob("*")
+        if p.is_file()
+    )
+    if relative:
+        file_paths = (p.relative_to(pkg_dir) for p in file_paths)
+
+    return sorted(file_paths)
