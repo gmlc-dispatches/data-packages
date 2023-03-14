@@ -25,7 +25,7 @@ A simple way to distribute and refer to data files that cannot be included direc
 - DISPATCHES data packages SHALL be available on GitHub as repositories owned by the `https://github.com/gmlc-dispatches` organization
 - DISPATCHES data packages MAY be available on PyPI
 - The naming scheme SHOULD be consistent and follow this convention (using `my-example` as a placeholder):
-  - Repository URL: https://github.com/gmlc-dispatches/my-example-data
+  - Repository URL: `https://github.com/gmlc-dispatches/my-example-data`
   - Python package distribution name: `dispatches-my-example-data`
 - The repository SHOULD register itself by adding the `dispatches-data-package` topic so that all data packages repositories can be browsed at the URL <https://github.com/topics/dispatches-data-package>
 - The repository MUST follow this directory structure:
@@ -83,12 +83,6 @@ pip show dispatches-my-example-data
 
 It should now be possible to access the data package from the client code, i.e. the DISPATCHES code that will load and use the data files, using the functions exposed in the `dispatches_data.api` module. These are simple functions that typically take the data package name (`my_example`) as a `str` argument.
 
-- `path()`: returns the absolute path to the data package on the filesystem as a `pathlib.Path` object
-- `files()`: returns the list of files found within the data package directory as a `list` of `pathlib.Path` objects
-- `discovered()` returns a dictionary where:
-  - The keys are the package directory names that were found in the current environment
-  - The values are instances of `PackageInfo` objects containing the complete importable package path (e.g. `dispatches_data.packages.my_example`) and the name of the package distribution (e.g. `dispatches-my-example-data`)
-
 #### Example
 
 Let's assume we want to create a dataframe from a file named `mydata.csv` in the `my_example` data package.
@@ -112,3 +106,7 @@ def main():
     df = load_data()
     ...  # rest of the code
 ```
+
+## API Reference
+
+See the documentation for the `dispatches_data.api` module on [ReadTheDocs](https://dispatches-data-packages.readthedocs.io/en/latest/).
