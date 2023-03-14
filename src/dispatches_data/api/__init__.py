@@ -116,13 +116,14 @@ def _from_string(key: str, resource: PackageResource = None) -> Path:
 
 
 AnyPackageSpecifier = Union[str, PackageInfo, ModuleType]
+GlobPattern = str
 
 
-def files(spec: AnyPackageSpecifier, relative: bool = False) -> List[Path]:
+def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**", relative: bool = False) -> List[Path]:
     pkg_dir = path(spec)
     file_paths = (
         p
-        for p in pkg_dir.rglob("*")
+        for p in pkg_dir.glob(pattern)
         if p.is_file()
     )
     if relative:
