@@ -81,7 +81,7 @@ pip show dispatches-my-example-data
 
 ### Step 4
 
-It should now be possible to access the data package from the client code, i.e. the DISPATCHES code that will load and use the data files, using the functions exposed in the `dispatches_data.api` module. These are simple functions that typically take the data package name (`the_example`) as a `str` argument.
+It should now be possible to access the data package from the client code, i.e. the DISPATCHES code that will load and use the data files, using the functions exposed in the `dispatches_data.api` module. These are simple functions that typically take the data package name (`my_example`) as a `str` argument.
 
 - `path()`: returns the absolute path to the data package on the filesystem as a `pathlib.Path` object
 - `files()`: returns the list of files found within the data package directory as a `list` of `pathlib.Path` objects
