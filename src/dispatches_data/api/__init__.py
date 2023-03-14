@@ -160,7 +160,7 @@ AnyPackageSpecifier = Union[str, PackageInfo, ModuleType]
 GlobPattern = str
 
 
-def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**", relative: bool = False) -> List[Path]:
+def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**/*", relative: bool = False) -> List[Path]:
     """
     Get absolute paths to files inside a data package.
 
@@ -168,6 +168,13 @@ def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**", relative: bool
 
     By default, all files from all subdirectories are returned. The `pattern` argument can be specified to only return
     files matching the pattern.
+
+    .. important:: Note that certain patterns (most importantly the recursive directory pattern ``**``) only match
+       *directories*, rather than *files*, and therefore (somewhat counter-intuitively) might cause
+       an empty list to be returned (since this function filters out directory paths from the result).
+       In general, to match files, the ``**`` pattern must be used in combination with at least 
+       a path separator and ``*``.
+       See e.g. the pattern matching all files recursively (which is the default): ``**/*``.
 
     Arguments:
         spec: The data package specified in any of the supported ways (see :func:`path`)
