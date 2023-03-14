@@ -110,7 +110,7 @@ def _from_string(key: str, resource: PackageResource = None) -> Path:
     try:
         info = by_key[key]
     except KeyError:
-        raise LookupError(f"{key!r} not found among discovered packages: {package_name_by_key}")
+        raise LookupError(f"{key!r} not found among discovered packages: {by_key}")
 
     return path(info, resource)
 
