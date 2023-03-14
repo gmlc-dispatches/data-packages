@@ -96,17 +96,17 @@ def discovered(parent: str = "dispatches_data.packages") -> Dict[str, PackageInf
         and the values are :class:`PackageInfo` instances for that data package.
     """
 
-    discovered = [
+    discovered_infos = [
         info for info in PackageInfo.from_parent_package(parent)
         if not info.package_name == __spec__.name
     ]
 
     if not discovered:
-        _logger.warning(f"No package discovered from parent package {parent_name!r}")
+        _logger.warning("No package discovered from parent package %r", parent)
 
     return {
         info.key: info
-        for info in discovered
+        for info in discovered_infos
     }
 
 
@@ -150,8 +150,8 @@ def _from_string(key: str, resource: PackageResource = None) -> Path:
     by_key = dict(discovered())
     try:
         info = by_key[key]
-    except KeyError:
-        raise LookupError(f"{key!r} not found among discovered packages: {by_key}")
+    except KeyError as exc:
+        raise LookupError(f"{key!r} not found among discovered packages: {by_key}") from exc
 
     return path(info, resource)
 
