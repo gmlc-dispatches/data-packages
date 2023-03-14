@@ -22,12 +22,12 @@ A simple way to distribute and refer to data files that cannot be included direc
 
 ### Requirements and Conventions
 
-
 - DISPATCHES data packages SHALL be available on GitHub as repositories owned by the `https://github.com/gmlc-dispatches` organization
 - DISPATCHES data packages MAY be available on PyPI
 - The naming scheme SHOULD be consistent and follow this convention (using `my-example` as a placeholder):
   - Repository URL: https://github.com/gmlc-dispatches/my-example-data
   - Python package distribution name: `dispatches-my-example-data`
+- The repository SHOULD register itself by adding the `dispatches-data-package` topic so that all data packages repositories can be browsed at the URL <https://github.com/topics/dispatches-data-package>
 - The repository MUST follow this directory structure:
 
   ```txt
