@@ -5,7 +5,7 @@ from typing import List
 
 import pytest
 
-from dispatches_data_packages import api
+from dispatches_data import api
 
 
 def _is_nonempty_file(p: Path, min_size_bytes: int = 1) -> bool:
