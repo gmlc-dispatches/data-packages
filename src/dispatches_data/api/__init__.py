@@ -13,6 +13,13 @@ from typing import Optional
 from typing import Union
 
 
+__all__ = [
+    "path",
+    "files",
+    "discovered",
+]
+
+
 _logger = logging.getLogger(__name__)
 
 
@@ -29,6 +36,10 @@ def _parts_to_modname(parts: Iterable[str]) -> str:
 
 @dataclass
 class PackageInfo:
+    """
+    Utility class representing information associated with each data package.
+    """
+
     key: str
     package_name: str
     distribution_name: str
@@ -48,6 +59,13 @@ class PackageInfo:
 
     @classmethod
     def from_parent_package(cls, dotted_name: str) -> Iterable["PackageInfo"]:
+        """
+        Get information for data packages discovered under the common parent package specified by `dotted_name`.
+
+        Returns:
+            An iterable of :class:`PackageInfo` objects (one for each discovered data package)
+        """
+
         parent_package_parts = list(_modname_to_parts(dotted_name))
         top_level = parent_package_parts[0]
 
@@ -70,6 +88,14 @@ class PackageInfo:
 
 
 def discovered(parent: str = "dispatches_data.packages") -> Dict[str, PackageInfo]:
+    """
+    Get information about data packages that have been discovered in the current environment.
+
+    Returns:
+        A dict whose keys are the discovered data package directory's name,
+        and the values are :class:`PackageInfo` instances for that data package.
+    """
+
     discovered = [
         info for info in PackageInfo.from_parent_package(parent)
         if not info.package_name == __spec__.name
@@ -89,6 +115,21 @@ PackageResource = Optional[str]
 
 @singledispatch
 def path(package: ModuleType, resource: PackageResource = None) -> Path:
+    """
+    Get the absolute path to a data package as a :py:class:`pathlib.Path` object.
+
+    The data package can be specified as any of the supported types (via :func:`functools.singledispatch`).
+
+    Args:
+        package: The data package, as one of the supported types
+
+        resource: If given, it must refer to a file (not a directory) located inside the data package directory
+            (not in a subdirectory). If the file specified by `resource` is found, its path (rather than the package directory's path)
+            will be returned
+
+    Returns:
+        Absolute path to the data package or to the file specified by `resource` contained inside it.
+    """
     if resource is not None:
         with resources.path(package, resource) as p:
             return Path(p)
@@ -120,6 +161,23 @@ GlobPattern = str
 
 
 def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**", relative: bool = False) -> List[Path]:
+    """
+    Get absolute paths to files inside a data package.
+
+    Only files (as opposed to directories) are returned.
+
+    By default, all files from all subdirectories are returned. The `pattern` argument can be specified to only return
+    files matching the pattern.
+
+    Arguments:
+        spec: The data package specified in any of the supported ways (see :func:`path`)
+        pattern: A glob pattern (as supported by :mod:`glob` or :meth:`pathlib.Path.glob`)
+        relative: If given, the returned paths will be relative to the data package directory
+
+    Returns:
+        Absolute paths of files found within the data package as a :class:`list` of :class:`pathlib.Path` objects.
+    """
+
     pkg_dir = path(spec)
     file_paths = (
         p
