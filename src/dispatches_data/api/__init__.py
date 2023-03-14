@@ -60,7 +60,7 @@ class PackageInfo:
     @classmethod
     def from_parent_package(cls, dotted_name: str) -> Iterable["PackageInfo"]:
         """
-        Get information for data packages discovered under the common parent package specified by `dotted_name`.
+        Get information for data packages discovered under the common parent package specified by ``dotted_name``.
 
         Returns:
             An iterable of :class:`PackageInfo` objects (one for each discovered data package)
@@ -124,11 +124,11 @@ def path(package: ModuleType, resource: PackageResource = None) -> Path:
         package: The data package, as one of the supported types
 
         resource: If given, it must refer to a file (not a directory) located inside the data package directory
-            (not in a subdirectory). If the file specified by `resource` is found, its path (rather than the package directory's path)
+            (not in a subdirectory). If the file specified by ``resource`` is found, its path (rather than the package directory's path)
             will be returned
 
     Returns:
-        Absolute path to the data package or to the file specified by `resource` contained inside it.
+        Absolute path to the data package or to the file specified by ``resource`` contained inside it.
     """
     if resource is not None:
         with resources.path(package, resource) as p:
@@ -166,7 +166,7 @@ def files(spec: AnyPackageSpecifier, pattern: GlobPattern = "**/*", relative: bo
 
     Only files (as opposed to directories) are returned.
 
-    By default, all files from all subdirectories are returned. The `pattern` argument can be specified to only return
+    By default, all files from all subdirectories are returned. The ``pattern`` argument can be specified to only return
     files matching the pattern.
 
     .. important:: Note that certain patterns (most importantly the recursive directory pattern ``**``) only match
