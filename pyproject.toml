@@ -21,3 +21,6 @@ dynamic = ["version"]
 
 [project.entry-points.pytest11]
 data_packages = "dispatches_data.testing.plugins:plugin"
+
+[project.scripts]
+dispatches-data-packages = "dispatches_data.api._cli:main"
