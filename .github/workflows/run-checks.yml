@@ -1,0 +1,68 @@
+name: Check data package
+
+on:
+  workflow_call:
+    inputs:
+      repository:
+        type: string
+        description: Full name (owner/repo) of the repository containing the data package(s)
+        required: true
+      ref:
+        type: string
+        description: Git ref to run checks on. Defaults to 'main'
+        required: false
+        default: main
+      pypi-max-file-size-mb:
+        type: string
+        description: Max file size allowed for uploading to PyPI in megabytes
+        required: false
+        default: "100"
+      python-version:
+        type: string
+        description: Python version to use for building the package
+        required: false
+        default: '3.8'
+
+env:
+  PIP_PROGRESS_BAR: "off"
+
+jobs:
+  pypi-max-size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.ref }}
+      - uses: actions/setup-python@v3
+        with:
+          python-version: ${{ inputs.python-version }}
+      - name: Install build dependencies
+        run: |
+          pip install build
+      - name: Build Python package simulating PyPI upload
+        run: |
+          python -m build .
+      - name: Check file size of build artifacts
+        shell: python {0}
+        env:
+          dir_to_check: "./dist/"
+          max_size_mb: ${{ inputs.pypi-max-file-size-mb }}
+        run: |
+          import os
+          from pathlib import Path
+
+          ONE_MB = 1024 * 1024
+          MAX_BYTES = int(os.environ["max_size_mb"]) * ONE_MB
+          dir_to_check = Path(os.environ["dir_to_check"]).resolve()
+
+          file_paths = sorted(
+              p for p in dir_to_check.glob("*")
+              if p.is_file()
+          )
+          size_by_file = {
+              str(p): p.stat().st_size
+              for p in file_paths
+          }
+          if not all(size < MAX_BYTES for size in size_by_file.values()):
+              raise ValueError(f"One or more files exceed size limit ({MAX_BYTES}): {size_by_file}")
