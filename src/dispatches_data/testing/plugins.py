@@ -62,7 +62,7 @@ class DataPackagePlugin:
         parser.addoption("--data-package", dest="data_packages", action="append")
 
     def pytest_configure(self, config):
-        self._to_check = list(config.option.data_packages)
+        self._to_check = list(config.option.data_packages or [])
 
     def _create_test_items(self, key: str, parent) -> Iterable[pytest.Item]:
         for_package = DataPackage.from_parent(
